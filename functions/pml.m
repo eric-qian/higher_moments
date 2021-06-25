@@ -1,7 +1,10 @@
-function [H, C_opt] = pml(X, log_dens, C_init, opts)
+function [H, C_opt] = pml(X, log_dens, C_init, opts, findGlobal)
 
     % Pseudo Maximum Likelihood (PML) estimation of ICA model
-
+    if ~exist('globalSearch')
+        findGlobal = 0;
+    end
+    
     % Whiten the data
     [T,n] = size(X);
     [U,Sigma_chol] = whiten(X);
@@ -19,10 +22,27 @@ function [H, C_opt] = pml(X, log_dens, C_init, opts)
     
     % Compute pseudo-MLE of vec(C)
     nll = @(C_vec) obj(C_vec,log_dens,U,T,n); % Negative log likelihood
+    
+    if findGlobal == 0
     C_vec_opt = fmincon(nll, C_init(:), ...
                         [], [], [], [], [], [], ...
                         @(C_vec) cons(C_vec,n), ...
                         opts);
+                    
+    else
+        gs      = GlobalSearch;
+        nParams = length(C_init(:));
+        
+        problem = createOptimProblem('fmincon', 'objective', nll, ...
+            'x0', C_init(:), ...
+            'lb', repmat(-1.01, nParams, 1),...  % C is an orthogonal matrix
+            'ub', repmat(1.01, nParams, 1), 'options', opts, ...
+            'nonlcon', @(C_vec) cons(C_vec,n));
+        C_vec_opt = run(gs, problem);
+    end
+    
+    
+    
     C_opt = reshape(C_vec_opt,n,n); % vec(C) -> C
     
     % Un-whiten estimate

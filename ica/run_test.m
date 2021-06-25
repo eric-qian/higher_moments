@@ -1,5 +1,5 @@
 clear all;
-addpath('functions');
+addpath('../functions');
 
 % Test ICA code
 % MPM 2021-05-26
