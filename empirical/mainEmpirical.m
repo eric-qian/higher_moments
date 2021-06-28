@@ -177,6 +177,7 @@ for j = 1:nSpec
         % Flip signs to ensure positive diagonal
         the_estim       = C_estim_raw(:,:,im).*sign(diag(C_estim_raw(:,:,im))'); 
         C_estim(:,:,im) = permute_mat(the_estim, CRef); % Best-fitting column permutation
+%        C_estim(:,:,im) = the_estim; 
         C_estim_raw(:,:,im) = the_estim;
     end
    
@@ -240,7 +241,7 @@ for jFig = idx_ugap
     colormap(cm)
     figIdx = figIdx + 1;
 end
-
+subplot(3,3,9)
 heatmap(Spec(jFig).CRef, 'ColorbarVisible', 'on', 'ColorLimits', [-1 1])
 title('Paper')
 colormap(cm)
@@ -263,7 +264,7 @@ for jFig = idx_ygap
     colormap(cm)
     figIdx = figIdx + 1;
 end
-
+subplot(3,3,9)
 heatmap(Spec(jFig).CRef, 'ColorbarVisible', 'on', 'ColorLimits', [-1 1])
 title('Paper')
 colormap(cm)
