@@ -32,7 +32,7 @@ initSettingVec = {'cumul', 'identity', 'reference', 'GlobalSearch', 'MultiStart'
 
 
 
-for jInit = 4:length(initSettingVec)
+for jInit = 1:length(initSettingVec)
     % Initialization settings for PML routine
     
     disp(['Spec ' num2str(jInit) ' of ' num2str(length(initSettingVec)) '...'])
