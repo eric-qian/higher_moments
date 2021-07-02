@@ -42,8 +42,11 @@ function [teststat, teststats_boot, A, c, shocks, H, H_cumul] = var_test_indep(Y
         rand_seeds = randi(2^32-1,numboot,1);        
         timer = tic;
         
-        parfor ib=1:numboot
-
+        for ib=1:numboot
+            
+%             clc
+%             disp(['Running ' num2str(ib) ' of ' num2str(numboot) '...' ])
+            
             rng(rand_seeds(ib), 'twister'); % Seed RNG
 
             % Random block of initial values

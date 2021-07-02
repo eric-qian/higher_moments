@@ -11,7 +11,8 @@ function [log_dens, log_dens_grad] = normal_mixture(X, mus, sigmas, probs)
         the_norms = normpdf(X(:,i),mus(:,i)',sigmas(:,i)');
         log_dens(:,i) = log(the_norms*probs(:,i)); % Log density
         if nargout>1
-            log_dens_grad(:,i) = exp(-log_dens(:,i)).*((-the_norms.*((X(:,i)-mus(:,i)')./(sigmas(:,i)'.^2)))*probs(:,i)); % Gradient
+            log_dens_grad(:,i) = exp(-log_dens(:,i)).*...
+                ((-the_norms.*((X(:,i)-mus(:,i)')./(sigmas(:,i)'.^2)))*probs(:,i)); % Gradient
         end
     end
 
