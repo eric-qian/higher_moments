@@ -1,4 +1,4 @@
-function [H, C_opt, allmins, optEye] = pml(X, log_dens, C_init, opts, findGlobal)
+function [H, C_opt, allmins, loglik] = pml(X, log_dens, C_init, opts, findGlobal)
 
 % Pseudo Maximum Likelihood (PML) estimation of ICA model
 if ~exist('findGlobal')
@@ -24,12 +24,13 @@ end
 nll = @(C_vec) obj(C_vec,log_dens,U,T,n); % Negative log likelihood
 
 if findGlobal == 0
-    C_vec_opt = fmincon(nll, C_init(:), ...
+    [C_vec_opt,  f_opt]= fmincon(nll, C_init(:), ...
         [], [], [], [], [], [], ...
         @(C_vec) cons(C_vec,n), ...
         opts);
     
     allmins = [];
+    
 elseif findGlobal == 1  % Global search
     gs      = GlobalSearch;
     nParams = length(C_init(:));
@@ -39,7 +40,7 @@ elseif findGlobal == 1  % Global search
         'lb', repmat(-1.01, nParams, 1),...  % C is an orthogonal matrix
         'ub', repmat(1.01, nParams, 1), 'options', opts, ...
         'nonlcon', @(C_vec) cons(C_vec,n));
-    [C_vec_opt, ~,~,~,allmins] = run(gs, problem);
+    [C_vec_opt, f_opt,~,~,allmins] = run(gs, problem);
     
 elseif findGlobal == 2  % Multi start
     ms      = MultiStart;
@@ -50,7 +51,8 @@ elseif findGlobal == 2  % Multi start
         'lb', repmat(-1.01, nParams, 1),...  % C is an orthogonal matrix
         'ub', repmat(1.01, nParams, 1), 'options', opts, ...
         'nonlcon', @(C_vec) cons(C_vec,n));
-    [C_vec_opt, ~,~,~,allmins] = run(ms, problem, 1000);  
+    [C_vec_opt, f_opt,~,~,allmins] = run(ms, problem, 1000);  
+
     
     
 else
@@ -58,12 +60,9 @@ else
     
 end
 
-
-
-C_opt = reshape(C_vec_opt,n,n); % vec(C) -> C
-
-% Un-whiten estimate
-H = Sigma_chol*C_opt;
+loglik = -f_opt;
+C_opt  = reshape(C_vec_opt,n,n);  % vec(C) -> C
+H      = Sigma_chol*C_opt;        % Un-whiten estimate
 
 end
 

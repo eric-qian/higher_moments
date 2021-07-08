@@ -13,9 +13,9 @@ df = readtimetable('data/data.xls');  % Read data
 
 % Estimation windows
 windows = [datetime(1959, 10, 1), datetime(2015, 1, 1);   % Largest sample (1959-2015)
-    datetime(1959, 10, 1), datetime(1984, 10,1);   % Pre 84
-    datetime(1985, 1 , 1), datetime(2015, 1 ,1);   % Post 84 (1985-2015)
-    datetime(1973, 1,  1), datetime(2015, 1, 1)    % Post Bretton Woods (1973 2015)
+    datetime(1959, 10, 1), datetime(1984, 10,1);          % Pre 84
+    datetime(1985, 1 , 1), datetime(2015, 1 ,1);          % Post 84 (1985-2015)
+    datetime(1973, 1,  1), datetime(2015, 1, 1)           % Post Bretton Woods (1973 2015)
     ];
 
 
@@ -149,6 +149,7 @@ for jInit = 1:length(initSettingVec)
     
     rng(202105272, 'twister');      % Seed RNG
     
+    runSpec = 0;
     
     %% Run specifications
     if runSpec == 0
@@ -196,18 +197,18 @@ for jInit = 1:length(initSettingVec)
             if strcmp(initSetting, 'identity')
                 [teststats, teststats_boot, A, c, shocks, ...
                     H_estim(:,:,1),         H_estim(:,:,2),...
-                    C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins] = ...
+                    C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins, loglik] = ...
                     var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, eye(n));
                 
             elseif strcmp(initSetting, 'reference')
                 [teststats, teststats_boot, A, c, shocks, ...
                     H_estim(:,:,1),         H_estim(:,:,2),...
-                    C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins] = ...
+                    C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins, loglik] = ...
                     var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, CRef);
             else
                 [teststats, teststats_boot, A, c, shocks, ...
                     H_estim(:,:,1),         H_estim(:,:,2),...
-                    C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins] = ...
+                    C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins, loglik] = ...
                     var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, initSetting);
             end
             
@@ -236,6 +237,7 @@ for jInit = 1:length(initSettingVec)
             Spec(j).teststats      = teststats;
             Spec(j).teststats_boot = teststats_boot;
             Spec(j).teststats_boot_quants = teststats_boot_quants;
+            Spec(j).loglik         = loglik;
         end
     end
     
@@ -424,19 +426,19 @@ for jInit = 1:length(initSettingVec)
     %% Create test rejection rate table
     
     vars_quant = strcat('boot_p', string(100*quants));
-    disp('Test rejection rate (top: nominal, bottom: actual):');
     out = array2table(nan(nSpec, length(quants)), ...
         'VariableNames', vars_quant);
     
     % Format table
     out.specification = string({Spec.nameDate}');
     out.teststats     = [Spec.teststats]';
-    out               = out(:, [end-1, end, 1:end-2]);
+    out.pvalue        = nan(nSpec, 1);
+    out               = out(:, [end-2, end-1, end, 1:end-3]);
     
     for jSpec = 1:nSpec
-        teststats_boot_quants  = Spec(jSpec).teststats_boot_quants;
         teststats              = Spec(jSpec).teststats;
         out{jSpec, vars_quant} = Spec(jSpec).teststats_boot_quants;
+        out.pvalue(jSpec)      = mean(Spec(jSpec).teststats_boot > Spec(jSpec).teststats);
     end
     
     writetable(out, [pathFigs 'bootTest.xls'])
@@ -444,3 +446,66 @@ for jInit = 1:length(initSettingVec)
     close all
     save([pathFigs 'Results.mat'], '-v7.3')
 end
+
+
+%% Summarize results for initialization
+
+loglik_mat = nan(nSpec, length(initSettingVec));
+aad_mat    = nan(nSpec, length(initSettingVec));
+
+
+for jSpec = 1:nSpec
+    for jInit = 1:length(initSettingVec)
+        % Load results file
+        pathFigs = ['figures/initSetting=' initSettingVec{jInit} '_'];
+        Results  = load([pathFigs 'Results.mat']);
+        Spec     = Results.Spec;
+
+        % Store C matrices
+        C_pml = Spec(jSpec).C_estim(:,:,1);
+        CRef  = Spec(jSpec).CRef; 
+        
+        loglik_mat(jSpec, jInit) = Spec(jSpec).loglik;        
+        aad_mat(jSpec, jInit)    = mean(abs(CRef(:) - C_pml(:)));
+        
+    end
+    
+    
+end
+
+
+% Show log likelihoods
+close all
+f = figure('Visible', vis);
+h              = heatmap( initSettingVec, {Spec.nameDate}, loglik_mat);
+h.ColorScaling = 'scaledrows';
+title('Log likelihood')
+h.ColorbarVisible = 'off';
+f.Units = 'inches';
+f.Position(3:4) = [8,8];
+saveas(gcf, 'figures/loglik.png')
+
+% Show AAD
+close all
+f = figure('Visible', vis);
+h              = heatmap( initSettingVec, {Spec.nameDate}, aad_mat);
+h.ColorScaling = 'scaledrows';
+title('Average absolute deviation from GMR')
+h.ColorbarVisible = 'off';
+f.Units = 'inches';
+f.Position(3:4) = [8,8];
+saveas(gcf, 'figures/aad.png')
+
+
+% Output matrices to Excel
+out = num2cell(loglik_mat);
+out = [{Spec.nameDate}' out];
+out = [{''} initSettingVec; out];
+writecell(out, 'figures/loglik.xls')
+
+out = num2cell(aad_mat);
+out = [{Spec.nameDate}' out];
+out = [{''} initSettingVec; out];
+writecell(out, 'figures/aad.xls')
+
+

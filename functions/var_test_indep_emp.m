@@ -1,4 +1,4 @@
-function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmins] = var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, initSetting)
+function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmins, loglik] = var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, initSetting)
 
 % Adapted from var_test_indep.m
 % Replicates the approach of the empirical example in
@@ -21,17 +21,17 @@ end
 
 if isa(initSetting, 'char')
     if strcmp(initSetting, 'cumul')
-        [H, C, allmins] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
+        [H, C, allmins, loglik] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
             pml_settings.sigmas, pml_settings.ps), ...
             C_cumul, pml_settings.opts, 0);
         
     elseif strcmp(initSetting, 'GlobalSearch')
-        [H, C, allmins] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
+        [H, C, allmins, loglik] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
             pml_settings.sigmas, pml_settings.ps), ...
             C_cumul, pml_settings.opts, 1);
         
     elseif strcmp(initSetting, 'MultiStart')
-        [H, C, allmins] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
+        [H, C, allmins, loglik] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
             pml_settings.sigmas, pml_settings.ps), ...
             C_cumul, pml_settings.opts, 2);
         
@@ -42,7 +42,7 @@ if isa(initSetting, 'char')
 elseif isa(initSetting, 'double')
     % Estimate H by PML. Input spherical residuals into pml routine.
     
-    [H, C, allmins] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
+    [H, C, allmins, loglik] = pml(res, @(X) normal_mixture(X, pml_settings.mus, ...
         pml_settings.sigmas, pml_settings.ps), ...
         initSetting, pml_settings.opts, 0);
 else
@@ -58,8 +58,8 @@ corr_shocks_sq = corr(shocks.^2); % Correlation matrix for squared shocks
 teststat       = sqrt((sum(corr_shocks_sq(:).^2)-n)/(n^2-n)); % Root mean squared off-diagonal correlation
 
 
-if ~isempty(Z)
-    teststats_boot = NaN;  % Bootstrap procedure is incomplete
+if ~isempty(Z)  % Don't run bootstrap if there eis an exogenous regressor in the VAR
+    teststats_boot = NaN;  
 else
     %%  Bootstrap
     
