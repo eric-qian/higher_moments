@@ -139,7 +139,7 @@ for jInit = 1:length(initSettingVec)
     quants  = [0.68 0.75 0.9 0.95];  % Bootstrap quantiles to store
     
     % Don't run bootstrap procedure for the GlobalSearch and MultiStart cases
-    if strcmp(initSetting, 'GlobalSearch') || strcmp(initSetting, 'MultiStart')
+    if strcmp(initSetting, 'MultiStart')
         numboot = [];
     else
         numboot = 1000;                   % No. of bootstrap iterations
@@ -149,7 +149,6 @@ for jInit = 1:length(initSettingVec)
     
     rng(202105272, 'twister');      % Seed RNG
     
-    runSpec = 0;
     
     %% Run specifications
     if runSpec == 0
@@ -207,10 +206,12 @@ for jInit = 1:length(initSettingVec)
                     C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins, loglik] = ...
                     var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, CRef);
             else
+                tic
                 [teststats, teststats_boot, A, c, shocks, ...
                     H_estim(:,:,1),         H_estim(:,:,2),...
                     C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins, loglik] = ...
                     var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, initSetting);
+                toc
             end
             
             
@@ -363,65 +364,6 @@ for jInit = 1:length(initSettingVec)
     end
     saveas(gcf, [pathFigs 'optimalLags.png'])
     
-    
-    %% Check other optima
-    
-    if strcmp(initSetting, 'GlobalSearch') || strcmp(initSetting, 'MultiStart')
-        mkdir([pathFigs, 'checkOptima/'])
-        
-        for j = 1:nSpec
-            allmins        = Spec(j).allmins;
-            XOptVals       = [allmins.X];
-            FOptVals       = [allmins.Fval];
-            [FOpt, jOpt]   = min(FOptVals);
-            
-            normXOptVals = vecnorm(XOptVals - repmat(XOptVals(:, jOpt), 1, size(XOptVals, 2)));
-            
-            figure('Visible', vis)
-            scatter(normXOptVals, FOptVals, 'filled')
-            box on
-            grid on
-            xlabel('Euclidean distance from optimal value')
-            ylabel('-log likelihood')
-            saveas(gcf, [pathFigs 'checkOptima/checkOptima_' strrep(Spec(j).nameDate, ':', '') '.png'])
-            
-            close all
-            for jVar1 = 1:size(XOptVals, 1)
-                
-                close
-                f               = figure('Visible', vis);
-                f.Units         = 'inches';
-                f.Position(3:4) = [6,6];
-                figIdx          = 1;
-                for jVar2 = 1:size(XOptVals, 1)
-                    
-                    subplot(3,3, figIdx)
-                    [FOptValsSorted, jSorted] = sort(FOptVals, 'descend');
-                    p = scatter(XOptVals(jVar1, jSorted), XOptVals(jVar2,jSorted), [], ...
-                        FOptValsSorted, 'filled');
-                    
-                    
-                    p.MarkerFaceAlpha = .6;
-                    p.SizeData = 20;
-                    colormap(gca, 'hot')
-                    box on
-                    grid on
-                    figIdx = figIdx+1;
-                    xlabel(['var ' num2str(jVar1)])
-                    ylabel(['var ' num2str(jVar2)])
-                    hold on
-                    scatter(XOptVals(jVar1, jOpt), XOptVals(jVar2, jOpt), ...
-                        [], FOpt, '^', 'filled', ...
-                        'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b')
-                end
-                sgtitle(['Variable ' num2str(jVar1)])
-                saveas(gcf, [pathFigs 'checkOptima/plotOptima_' strrep(Spec(j).nameDate, ':', '')...
-                    '_var=' num2str(jVar1) '.png'])
-                
-            end
-            
-        end
-    end
     
     
     %% Create test rejection rate table
