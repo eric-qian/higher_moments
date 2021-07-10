@@ -194,6 +194,7 @@ for jInit = 1:length(initSettingVec)
                 
             end
             
+            
             if strcmp(initSetting, 'identity')
                 [teststats, teststats_boot, A, c, shocks, ...
                     H_estim(:,:,1),         H_estim(:,:,2),...
@@ -460,12 +461,14 @@ for jSpec = 1:nSpec
         pathFigs = ['figures/initSetting=' initSettingVec{jInit} '_'];
         Results  = load([pathFigs 'Results.mat']);
         Spec     = Results.Spec;
-
+        T        = height(Spec(jSpec).dfEst) - Spec(jSpec).p;  % Sample length
+        
         % Store C matrices
         C_pml = Spec(jSpec).C_estim(:,:,1);
         CRef  = Spec(jSpec).CRef; 
         
-        loglik_mat(jSpec, jInit) = Spec(jSpec).loglik;        
+        loglik_mat(jSpec, jInit) = Spec(jSpec).loglik*T;  % Scaled for comparability
+
         aad_mat(jSpec, jInit)    = mean(abs(CRef(:) - C_pml(:)));
         
     end

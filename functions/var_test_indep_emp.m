@@ -58,7 +58,7 @@ corr_shocks_sq = corr(shocks.^2); % Correlation matrix for squared shocks
 teststat       = sqrt((sum(corr_shocks_sq(:).^2)-n)/(n^2-n)); % Root mean squared off-diagonal correlation
 
 
-if ~isempty(Z)  % Don't run bootstrap if there eis an exogenous regressor in the VAR
+if ~isempty(Z)  % Don't run bootstrap if there is an exogenous regressor in the VAR
     teststats_boot = NaN;  
 else
     %%  Bootstrap
