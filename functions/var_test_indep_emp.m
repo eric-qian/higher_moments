@@ -95,7 +95,6 @@ else
             the_Y_boot = var_sim(A, c, the_shocks_boot*H', T, the_Y_init);
             
             % Calculate test statistic on bootstrap sample
-%            teststats_boot(ib) = var_test_indep(the_Y_boot, p, pml_settings, 0, false);
             teststats_boot(ib) = var_test_indep_emp(the_Y_boot, Z, p, pml_settings, 0, false, initSetting);
 
             

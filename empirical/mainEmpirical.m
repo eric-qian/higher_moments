@@ -153,6 +153,8 @@ for jInit = 1:length(initSettingVec)
     %% Run specifications
     if runSpec == 0
         load([pathFigs 'Results.mat'])
+        runSpec = 0;      
+
     else
         for j = 1:nSpec
             
