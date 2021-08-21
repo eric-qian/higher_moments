@@ -16,7 +16,7 @@ mnems  = {'GDPC1', ...  Real GDP
 
 % Final estimation sample will start 1959:Q4. Fetch additional quarters for padding.
 tStart = datetime(1956, 1, 1);  
-tEnd   = datetime(2019, 12, 31);   
+tEnd   = datetime(2021, 6, 30);   
 
 
 %% Fetch raw data
@@ -59,8 +59,9 @@ df.ygap = log(df.GDPC1) - log(df.GDPPOT);                                % Outpu
 df.ugap = df.UNRATE - df.NROU;                                           % Unemployment gap
 %df.pi   = 100*[NaN; (df.GDPDEF(2:end)./ df.GDPDEF(1:end-1)).^4 - 1];     % CAGR
 df.pi   = 400*[NaN; log(df.GDPDEF(2:end)) - log(df.GDPDEF(1:end-1))];     
-df.doil = 100*[NaN; log(df.WTISPLC(2:end)) - log(df.WTISPLC(1:end-1))];  % Growth in oil price   
+df.doil = 400*[NaN; log(df.WTISPLC(2:end)) - log(df.WTISPLC(1:end-1))];  % Growth in oil price   
 df.R    = df.TB3MS;
 df      = df(2:end, :);                                                  % Drop first period
 
 writetimetable(df, [pathData 'data.xls'])
+
