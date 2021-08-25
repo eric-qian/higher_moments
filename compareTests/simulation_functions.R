@@ -5,21 +5,17 @@ simS = function(type, T, n)
 {
   if(type == 'normal') {  # iid standard normal shocks
     S = mvrnorm(T, rep(0, n), diag(3))
-  } else if(type == 't, 5'){  # iid t shocks, df=2
-    S = matrix(rt(3*T, 5), ncol=3)
-        
-  } else if(type == 't, 2'){  # iid t shocks, df=2
-    S = matrix(rt(3*T, 2), ncol=3)
     
-  } else if(type == 't, 1'){  # iid t shocks, df=1
-    S = matrix(rt(3*T, 1), ncol=3)   
+  } else if(str_detect(type, 't, df=')){  # iid t shocks
+    df = as.numeric(sapply(strsplit(type, "="), "[", 2))
+    S  = matrix(rt(n*T, df), ncol=n)
     
-  } else if (type == 'AR(1), 0.9'){  # Persistent AR(1) shocks
-    S     = genAR1(T, n, 0.9)
-  } else if (type == 'AR(1), 0.5'){  
-    S     = genAR1(T, n, 0.5)
-  } else if (type == 'AR(1), 0.1'){
-    S     = genAR1(T, n, 0.1)
+  } else if(str_detect(type, 'AR(1), rho=')){  # AR1
+    rho = as.numeric(sapply(strsplit(type, "="), "[", 2))
+    S  = genAR1(T, n, rho)
+  } else if(type == 'ARCH(1)'){
+    S = genARCHq(T, n, 0.5, 0.5)
+    
   }else if (str_detect(type, 'SV')) {  # Stochastic volatility 
     # SV, detecting varying tau. Format is "SV, tau=XX."
     
@@ -63,6 +59,30 @@ genAR1 = function(T, n, rho){
   }
   return(S)
 }
+
+# Make mutually independent ARCHq process for process of length T, n variables,
+# alpha0, and alphaLagVec = c(alpha1,...,alphaq) for model
+#    S_t = sqrt(h_t) * v_t,    v_t iid~ N(0,1)
+#    h_t = alpha_0 + alpha_1 S_t-1 ^2 +...+alpha_q S_t-q ^2
+genARCHq = function(T, n, alpha0, alphaLagVec){
+  q         = length(alphaLagVec)  # ARCH order
+  S         = matrix(rep(NA, (T+q)*n), ncol = n)
+  S[1:q, ]  = matrix(rep(0, q*n), nrow = q)
+  
+  for(t in (1+q):nrow(S)){
+    
+    h_t = rep(alpha0, n)         
+    for(l in 1:q){  # Loop through lags
+      h_t = h_t + alphaLagVec[l] * S[t-l,]^2
+    }
+    S[t, ] = sqrt(h_t) * rnorm(n) 
+    
+  }
+  
+  S = S[(q+1):nrow(S),]
+  return(S)
+}
+
 
 crossCorTest.stat = function(S){
   n              = ncol(S)
