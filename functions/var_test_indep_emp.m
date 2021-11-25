@@ -1,4 +1,4 @@
-function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmins, loglik] = var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, initSetting)
+function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmins, loglik] = var_test_indep_emp(Y, Z, p, pml_settings, numboot, verbose, initSetting, initSettingBoot)
 
 % Adapted from var_test_indep.m
 % Replicates the approach of the empirical example in
@@ -7,6 +7,10 @@ function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmin
 %% Initialization settings
 if ~exist('initSetting', 'var')
     initSetting = 'cumul';  % Set default to fourth order cumulant
+end
+
+if ~exist('initSettingBoot', 'var')
+    initSettingBoot = initSetting;  % Set default to the full-sample setting
 end
 
 %% Estimate SVAR
@@ -74,6 +78,12 @@ else
         rand_seeds = randi(2^32-1,numboot,1);
         timer = tic;
         
+        if isa(initSettingBoot, 'char')
+            if strcmp(initSettingBoot, 'MLE')
+                initSettingBoot = C;
+            end
+        end
+        
         for ib=1:numboot
             
             %             clc
@@ -95,7 +105,7 @@ else
             the_Y_boot = var_sim(A, c, the_shocks_boot*H', T, the_Y_init);
             
             % Calculate test statistic on bootstrap sample
-            teststats_boot(ib) = var_test_indep_emp(the_Y_boot, Z, p, pml_settings, 0, false, initSetting);
+            teststats_boot(ib) = var_test_indep_emp(the_Y_boot, Z, p, pml_settings, 0, false, initSettingBoot);
 
             
             % Print progress

@@ -367,6 +367,11 @@ for jInit = 1:length(initSettingVec)
     saveas(gcf, [pathFigs 'optimalLags.png'])
     
     
+    % Report optimal lags for each specification in a table
+    [~, lagOpt] = min([Spec.aic]);
+    outCell = cell(2, nSpec);
+    outCell(1,:) =     {Spec.nameDate};
+    outCell(2,:) = num2cell(lagOpt)
     
     %% Create test rejection rate table
     
