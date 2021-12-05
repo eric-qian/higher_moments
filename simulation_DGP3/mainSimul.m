@@ -19,9 +19,9 @@ df_vol_vec  = [inf 1./logspace(-2.5, 0, 19)];
 T       = 200;
 burnin  = T/2;
 nVar    = 3;
-nSim    = 1500;
+nSim    = 1000;
 pMat    = [];
-numboot = 1000;
+numboot = 500;
 
 
 % Dry run
@@ -102,13 +102,9 @@ Spec  = struct;
 j     = 1;
 
 for df_vol = df_vol_vec
-    Spec(j).obj         = higher_moments_simul(T, burnin, nVar, nSim, pMat, df_vol, numboot, p_est, shockDGP1Settings, VARDGPSettings, PMLSettings, initSetting, initSettingBoot);
-    Spec(j).label       = ['t, df_vol=' num2str(df_vol)]; 
-    Spec(j+1).obj       = higher_moments_simul(T, burnin, nVar, nSim, pMat, df_vol, numboot, p_est, shockDGP2Settings, VARDGPSettings, PMLSettings, initSetting, initSettingBoot);
-    Spec(j+1).label     = ['Laplace, df_vol=' num2str(df_vol)]; 
-    Spec(j+2).obj       = higher_moments_simul(T, burnin, nVar, nSim, pMat, df_vol, numboot, p_est, shockDGP3Settings, VARDGPSettings, PMLSettings, initSetting, initSettingBoot);
-    Spec(j+2).label     = ['Mixture, df_vol=' num2str(df_vol)]; 
-    j                   = j+3;
+    Spec(j).obj       = higher_moments_simul(T, burnin, nVar, nSim, pMat, df_vol, numboot, p_est, shockDGP3Settings, VARDGPSettings, PMLSettings, initSetting, initSettingBoot);
+    Spec(j).label     = ['Mixture, df_vol=' num2str(df_vol)]; 
+    j                   = j+1;
 end
 
 nSpec = length(Spec);

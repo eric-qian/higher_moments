@@ -16,7 +16,7 @@ rng(202105272, 'twister');      % Seed RNG
 df_vol_vec  = [inf 1./logspace(-2.5, 0, 19)];
 
 % Settings (general)
-T       = 200;
+T       = 500;
 burnin  = T/2;
 nVar    = 3;
 nSim    = 1500;

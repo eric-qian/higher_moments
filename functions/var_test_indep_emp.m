@@ -10,7 +10,7 @@ if ~exist('initSetting', 'var')
 end
 
 if ~exist('initSettingBoot', 'var')
-    initSettingBoot = initSetting;  % Set default to the full-sample setting
+    initSettingBoot = 'MLE';  % Set default to the full-sample MLE
 end
 
 %% Estimate SVAR

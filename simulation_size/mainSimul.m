@@ -13,15 +13,15 @@ rng(202105272, 'twister');      % Seed RNG
 
 
 %  Degrees of freedom for shared volatility. Measures departure from null.
-df_vol_vec  = [inf 1./logspace(-2.5, 0, 19)];
+df_vol_vec  = inf;
 
 % Settings (general)
-T       = 200;
+T       = 5000;
 burnin  = T/2;
 nVar    = 3;
-nSim    = 1500;
+nSim    = 1000;
 pMat    = [];
-numboot = 1000;
+numboot = 500;
 
 
 % Dry run
@@ -124,8 +124,6 @@ for j = 1:nSpec  % For each shock/volatility spec
     H_estim               = nan(nSim, nVar, nVar); % Last dimension: 1 is PML and 2 is cumulant estimate
     H_estim_cumul         = nan(nSim, nVar, nVar); % Last dimension: 1 is PML and 2 is cumulant estimate
     rand_seeds            = randi(2^32-1,nSim, 1);
-    A_estim               = nan([nSim, size(obj.VARDGPSettings.A_true)]);
-    c_estim               = nan([nSim, size(obj.VARDGPSettings.c_true)]);
     
     
     tic
@@ -139,8 +137,6 @@ for j = 1:nSpec  % For each shock/volatility spec
         teststats(ii)               = Res.teststat;
         H_estim(ii, :, :)           = Res.H;
         H_estim_cumul(ii, :, :)     = Res.H_cumul;
-        A_estim(ii, :, :)           = Res.A;
-        c_estim(ii, :, :)           = Res.c;
     
     end
     
@@ -153,8 +149,6 @@ for j = 1:nSpec  % For each shock/volatility spec
      Sim.teststats_boot_quants = teststats_boot_quants;
      Sim.H_estim               = H_estim;
      Sim.H_estim_cumul         = H_estim_cumul;     
-     Sim.A_estim               = A_estim;
-     Sim.c_estim               = c_estim;
      Sim.rand_seeds            = rand_seeds;
      Sim.runtime               = runtime;
      Spec(j).Sim               = Sim; 

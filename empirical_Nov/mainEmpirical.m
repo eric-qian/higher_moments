@@ -8,7 +8,7 @@ pathFiguresBase = 'figures2019/';
 mkdir(pathFiguresBase)
 
 addpath(pathFunctions)
-poolobj = parpool('local', 16);
+%poolobj = parpool('local', 16);
 
 
 runSpec = 1;      % 0 to load existing results files. 1 to rerun.
@@ -149,12 +149,7 @@ for jInit = 1:length(initSettingVec)
     % Simulation settings
     quants  = [0.68 0.75 0.9 0.95];  % Bootstrap quantiles to store
     
-    % Don't run bootstrap procedure for the MultiStart cases
-    if strcmp(initSetting, 'MultiStart')
-        numboot = [];
-    else
-        numboot = 1000;                   % No. of bootstrap iterations
-    end
+    numboot = 1000;                   % No. of bootstrap iterations
     
     verbose = true;
     
@@ -240,6 +235,8 @@ for jInit = 1:length(initSettingVec)
             Spec(j).C_estim        = C_estim;
             Spec(j).C_estim_raw    = C_estim_raw;
             Spec(j).H_estim        = H_estim;
+            Spec(j).A              = A;
+            Spec(j).c              = c;            
             Spec(j).dfEst          = dfEst;
             Spec(j).aic            = aic;
             Spec(j).hq             = hq;
