@@ -31,20 +31,32 @@ plotTableDGP3 = powerTable(strcmp(powerTable.DGP, 'DGP3'), :);
 
 %% Make plots
 
+% Plot settings
 close all
+f = figure;
+f.Units = 'inches';
+f.Position(3:4) = [6,2];
+f.PaperPosition = [0 0 6 2];
+f.PaperSize     = [6,2];
+hold on
 
+subplot(1,3,1)
 plotPower(plotTableDGP1)
-title(['DGP1 (T= ' num2str(T) ')'])
-saveas(gcf, [outDir 'DGP1.png'])
+ttl = title('Panel A. DGP1');
+formatPlot()
 
-
+subplot(1,3,2)
 plotPower(plotTableDGP2)
-title(['DGP2 (T= ' num2str(T) ')'])
-saveas(gcf, [outDir 'DGP2.png'])
+title('Panel B. DGP2')
+formatPlot()
 
+subplot(1,3,3)
 plotPower(plotTableDGP3)
-title(['DGP3 (T= ' num2str(T) ')'])
-saveas(gcf, [outDir 'DGP3.png'])
+title('Panel C. DGP3')
+formatPlot()
+
+saveas(gcf, [outDir 'power.pdf'])
+
 
 
 %% Compute estimated IRFs
@@ -137,7 +149,7 @@ end
 
 indSpec = [1 1+1*3*14 1+57];
 jPlot   = 1;
-jShock = 3
+jShock = 2
 close all
 f               = figure;
 f.Units         = 'inches';
@@ -189,22 +201,32 @@ legend(p, strrep({Spec(indSpec).label}, '_vol', ''), ...
 function plotPower(plotTable)
 
 
-LW = 1.25;
+LW = .8;
 Cols = [228,26,28;
     55,126,184;
     77,175,74;
     152,78,163;
     255,127,0] ./255;
 
-f = figure;
-f.Units = 'inches';
-f.Position(3:4) = [6,3];
+
+scatter(0, 0.05, 25, '+', 'MarkerEdgeColor', 'b')
 hold on
-plot(1./plotTable.df_vol, plotTable.pi_05, 'LineWidth', LW, 'Color', Cols(1,:), 'LineStyle', '--')
+scatter(0, 0.10, 25, '+', 'MarkerEdgeColor', 'b')
+
+p1 = plot(1./plotTable.df_vol, plotTable.pi_05, 'LineWidth', LW, 'Color', Cols(1,:), 'LineStyle', '--');
 hold on
-plot(1./plotTable.df_vol, plotTable.pi_10, 'LineWidth', LW, 'LineStyle', '-', 'Color', Cols(1,:))
-legend({'5%', '10%'}, 'Location', 'southeast')
-xlabel('1/df')
+p2 = plot(1./plotTable.df_vol, plotTable.pi_10, 'LineWidth', LW, 'LineStyle', '-', 'Color', Cols(1,:));
+legend([p1, p2], {'5%', '10%'}, 'Location', 'southeast')
+xlabel('1/k')
 box on
 grid on
+
+
+end
+
+function formatPlot()
+ax = gca;
+ax.FontName = 'Times';
+ax.TitleHorizontalAlignment = 'left';
+ax.FontSize = 8;
 end

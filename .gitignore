@@ -5,3 +5,5 @@
 *.RData
 empirical/.Rhistory
 empirical/.Rhistory
+*.png
+*.pdf
