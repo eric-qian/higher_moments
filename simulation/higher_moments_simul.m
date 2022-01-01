@@ -14,7 +14,7 @@ classdef higher_moments_simul
         VARDGPSettings = []        % Settings for VAR estimation
         PMLSettings = []        % Settings for pseudo ML routine
         initSetting = 'cumul'   % Initialization setting for PML routine
-        initSettingBoot = 'MLE'  % Initialiation setting for PML routine in bootstrap
+        initSettingBoot = 'full'  % Initialiation setting for PML routine in bootstrap
     end
     
     methods
@@ -137,7 +137,10 @@ classdef higher_moments_simul
             [teststat, teststats_boot, A, c, ~, ...
                 H, H_cumul, C, C_cumul] = ...
                 var_test_indep_emp(Y, [], obj.p_est, obj.PMLSettings, ...
-                obj.numboot, 0, obj.initSetting, obj.initSettingBoot);
+                obj.numboot, 'verbose', 0, ...
+                'initSetting', obj.initSetting, ...
+                'initSettingBoot', obj.initSettingBoot);
+            
             
             % Best-fitting permutation
             H_cumul = higher_moments_simul.permuteH(H_cumul, obj.VARDGPSettings.H_true);

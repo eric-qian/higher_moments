@@ -4,7 +4,7 @@ clear
 clc
 close all
 
-poolobj = parpool('local', 30);
+poolobj = parpool('local', 1);
 addpath(genpath('../functions/'))
 
 % Simulation settings
@@ -24,16 +24,6 @@ pMat    = [];
 numboot = 1000;
 
 
-% Dry run
-% T       = 50;
-% burnin  = T/2;
-% nVar    = 3;
-% nSim    = 5;
-% pMat    = [];
-% numboot = 5;
-
-
-
 % DGP1 settings: Independent t 
 shockDGP1Settings     = struct;
 shockDGP1Settings.FUN = @simS_DGP1;  
@@ -46,9 +36,9 @@ shockDGP2Settings.location = 0;
 shockDGP2Settings.scale    = sqrt(1/2);
 
 % DGP3 Settings: Mixture of normals
-delta               = [0.8, 1.2, -1];
-kappa               = [0.06, 0.08, 0.2];
-lambda              = [0.52, 0.4, 0.2];
+delta                    = [0.8, 1.2, -1];
+kappa                    = [0.06, 0.08, 0.2];
+lambda                   = [0.52, 0.4, 0.2];
 shockDGP3Settings        = struct;
 shockDGP3Settings.FUN    = @simS_DGP3;  
 shockDGP3Settings.delta  = delta;
@@ -91,7 +81,7 @@ PMLSettings.opts     = optimoptions('fmincon', 'Display', 'notify', ...
     'SpecifyObjectiveGradient', true, 'SpecifyConstraintGradient', true, ...
     'CheckGradients', false, 'MaxFunctionEvaluations', 5e3); % fmincon options      
 initSetting     = 'GlobalSearch';
-initSettingBoot = 'MLE';
+initSettingBoot = 'full';
 
 p_est = 6;  % Number of lags for VAR estimation
 

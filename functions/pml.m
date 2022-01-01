@@ -1,9 +1,45 @@
-function [H, C_opt, allmins, loglik] = pml(X, log_dens, C_init, opts, findGlobal)
+function [H, C_opt, allmins, loglik] = pml(X, log_dens, C_init, varargin)
+%% Pseudo Maximum Likelihood (PML) estimation of ICA model
+% Input:
+% - X:             Data.
+% - log_dens:      Log density function (first argument is the log density 
+%                  and second argument is the gradient).
+% - C_init:        Initial whitened mixing matrix.
+% - opts:          Optimization settings.
+% - globalSetting: 'off' to run fmincon starting at C_init. 'GlobalSearch'
+%                  to run the GlobalSearch algorithm.
+%
+% Output:
+% - H:             Optimal unwhitened mixing matrix.
+% - C_opt:         Optimal whitened mixing matrix.
+% - allmins:       If global optimization routine is run, stores ALL
+%                  values of C.
+% - loglik:        Log-likelihood.
 
-% Pseudo Maximum Likelihood (PML) estimation of ICA model
-if ~exist('findGlobal')
-    findGlobal = 0;
-end
+
+%% Parse parameters
+
+% Default settings
+opts_default          = optimoptions('fmincon', 'Display', 'off', ...
+        'SpecifyObjectiveGradient', true, ...
+        'SpecifyConstraintGradient', true);
+globalSetting_default = 'GlobalSearch';
+
+    
+% Setup parser    
+parser = inputParser;
+addRequired(parser, 'X', @isnumeric);
+addRequired(parser, 'log_dens');
+addRequired(parser, 'C_init',        @isnumeric);
+addOptional(parser, 'opts',          opts_default);
+addOptional(parser, 'globalSetting', globalSetting_default, @(x)(ischar(x) | isstring(x)));
+
+
+parse(parser, X, log_dens, C_init, varargin{:});
+opts          = parser.Results.opts;
+globalSetting = parser.Results.globalSetting;
+
+
 
 % Whiten the data
 [T,n] = size(X);
@@ -14,16 +50,11 @@ if isempty(C_init)
     C_init = eye(n);
 end
 
-if isempty(opts)
-    opts = optimoptions('fmincon', 'Display', 'off', ...
-        'SpecifyObjectiveGradient', true, ...
-        'SpecifyConstraintGradient', true);
-end
 
 % Compute pseudo-MLE of vec(C)
 nll = @(C_vec) obj(C_vec,log_dens,U,T,n); % Negative log likelihood
 
-if findGlobal == 0
+if strcmp(globalSetting, "off")
     [C_vec_opt,  f_opt]= fmincon(nll, C_init(:), ...
         [], [], [], [], [], [], ...
         @(C_vec) cons(C_vec,n), ...
@@ -31,7 +62,7 @@ if findGlobal == 0
     
     allmins = [];
     
-elseif findGlobal == 1  % Global search
+elseif strcmp(globalSetting, "GlobalSearch")  % Global search
     gs      = GlobalSearch;
     nParams = length(C_init(:));
     
@@ -41,22 +72,10 @@ elseif findGlobal == 1  % Global search
         'ub', repmat(1.01, nParams, 1), 'options', opts, ...
         'nonlcon', @(C_vec) cons(C_vec,n));
     [C_vec_opt, f_opt,~,~,allmins] = run(gs, problem);
-    
-elseif findGlobal == 2  % Multi start
-    ms      = MultiStart;
-    nParams = length(C_init(:));
-    
-    problem = createOptimProblem('fmincon', 'objective', nll, ...
-        'x0', C_init(:), ...
-        'lb', repmat(-1.01, nParams, 1),...  % C is an orthogonal matrix
-        'ub', repmat(1.01, nParams, 1), 'options', opts, ...
-        'nonlcon', @(C_vec) cons(C_vec,n));
-    [C_vec_opt, f_opt,~,~,allmins] = run(ms, problem, 1000);  
-
-    
+        
     
 else
-    error('Enter valid findGlobal parameter...')
+    error('Enter valid globalSetting parameter...')
     
 end
 
@@ -66,10 +85,10 @@ H      = Sigma_chol*C_opt;        % Un-whiten estimate
 
 end
 
+%% (Negative) log likelihood and gradient
 
 function [val, grad] = obj(C_vec, log_dens, U, T, n)
 
-% (Negative) log likelihood and gradient
 
 C = reshape(C_vec,n,n); % vec(C) -> C
 CpU = U*C;
@@ -88,7 +107,7 @@ end
 
 end
 
-
+%% Constraint function 
 function [cons_ineq, cons_eq, cons_ineq_grad, cons_eq_grad] = cons(C_vec, n)
 
 % Orthogonality constraint function and gradient

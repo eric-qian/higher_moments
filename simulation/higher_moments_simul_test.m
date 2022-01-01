@@ -82,7 +82,7 @@ PMLSettings.opts     = optimoptions('fmincon', 'Display', 'notify', ...
     'SpecifyObjectiveGradient', true, 'SpecifyConstraintGradient', true, ...
     'CheckGradients', false, 'MaxFunctionEvaluations', 5e3); % fmincon options      
 initSetting = 'GlobalSearch';
-initSettingBoot = 'MLE';
+initSettingBoot = 'full';
 
 p_est = 6;  % Number of lags for VAR estimation
 
@@ -152,7 +152,7 @@ disp(mean((c(:)- obj_mix.VARDGPSettings.c_true(:)).^2 ))
 
 
 %% Test data generation function for short sample, t shocks
-obj_t.T = 200;
+obj_t.T = 20000;
 Y   = simY(obj_t);
 [A, Sigma, c] = var_estim2(Y, obj_t.p_est, []);
 disp('MSE, A')
@@ -162,7 +162,7 @@ disp('MSE, c')
 disp(mean((c(:)- obj_t.VARDGPSettings.c_true(:)).^2 ))
 
 %% Test data generation function for short sample, laplace shocks
-obj_lapl.T = 200;
+obj_lapl.T = 20000;
 Y   = simY(obj_t);
 [A, Sigma, c] = var_estim2(Y, obj_lapl.p_est, []);
 disp('MSE, A')
@@ -174,7 +174,7 @@ disp(mean((c(:)- obj_lapl.VARDGPSettings.c_true(:)).^2 ))
 
 
 %% Test data generation function for short sample, mixture shocks
-obj_mix.T = 200;
+obj_mix.T = 20000;
 Y   = simY(obj_t);
 [A, Sigma, c] = var_estim2(Y, obj_mix.p_est, []);
 disp('MSE, A')
