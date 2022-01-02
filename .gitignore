@@ -8,3 +8,4 @@ empirical/.Rhistory
 *.png
 *.pdf
 *.slurm
+empirical/figures2019/initSetting=GlobalSearch_bootTest.xls
