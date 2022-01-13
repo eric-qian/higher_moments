@@ -1,6 +1,6 @@
 # Identification from Higher Moments
 
-This repo contains the MATLAB code for Olea, Plagborg-Møller, Qian (2022): "SVAR Identification From Higher Moments: Has the Simultaneous Causality Problem Been Solved?" 
+This repo contains the MATLAB code for Montiel Olea, Plagborg-Møller, Qian (2022): "SVAR Identification From Higher Moments: Has the Simultaneous Causality Problem Been Solved?" 
 
 **Development note**: Tested with MATLAB R2020b on macOS Monterey 12.1. 
 
