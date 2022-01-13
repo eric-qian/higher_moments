@@ -19,9 +19,9 @@ df_vol_vec  = [inf 1./logspace(-2.5, 0, 19)];
 T       = 200;
 burnin  = T/2;
 nVar    = 3;
-nSim    = 1500;
+nSim    = 1000;
 pMat    = [];
-numboot = 1000;
+numboot = 500;
 
 
 % DGP1 settings: Independent t 
@@ -31,7 +31,7 @@ shockDGP1Settings.df  = 5;
 
 % DGP2 settings: Independent Laplace
 shockDGP2Settings          = struct;
-shockDGP2Settings.FUN       = @simS_DGP2;  
+shockDGP2Settings.FUN      = @simS_DGP2;  
 shockDGP2Settings.location = 0;
 shockDGP2Settings.scale    = sqrt(1/2);
 
