@@ -30,6 +30,14 @@ plotTableDGP2 = powerTable(strcmp(powerTable.DGP, 'DGP2'), :);
 plotTableDGP3 = powerTable(strcmp(powerTable.DGP, 'DGP3'), :);
 
 
+%% 
+clc
+
+disp("df_vol=inf")
+disp([plotTableDGP1(1,:);
+plotTableDGP2(1,:);
+plotTableDGP3(1,:)])
+
 %% Make plots
 
 % Plot settings

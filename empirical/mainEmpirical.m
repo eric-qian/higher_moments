@@ -3,7 +3,7 @@ clear
 clc
 close all
 
-rng(202105272, 'twister');      % Seed RNG
+rng(20220113, 'twister');      % Seed RNG
 
 
 % Settings
@@ -58,16 +58,12 @@ for jWindow = 1:size(windows, 1)
     Spec(jWindow).mnems_VAR = {'pi', 'ygap', 'R'};
     Spec(jWindow).mnems_exo = [];        % Exogenous variables
     Spec(jWindow).p          = 6;         % lags    
-        
-    % Reference matrix (from GMR 2017)
-    Spec(jWindow).CRef = [0.9560   -0.2710   -0.1160;
-                          0.2580    0.9590   -0.1160;
-                          0.1430    0.0810    0.9860];
-    
+            
     
     % Add dates
     Spec(jWindow).TStart = windows(jWindow, 1);
     Spec(jWindow).TEnd   = windows(jWindow, 2);
+    
     
     % Add estimation sample to the specification's name
     Spec(jWindow).nameDate = ...
@@ -90,7 +86,6 @@ else
         mnems_VAR = Spec(j).mnems_VAR;
         mnems_exo = Spec(j).mnems_exo;
         p         = Spec(j).p;
-        CRef      = Spec(j).CRef;
         TStart    = Spec(j).TStart;
         TEnd      = Spec(j).TEnd;
         dfEst     = df(df.Time >= TStart - calquarters(p) & df.Time <= TEnd, :);
@@ -134,8 +129,8 @@ else
             
         else 
             [teststats, teststats_boot, A, c, shocks, ...
-                H_estim(:,:,1),         H_estim(:,:,2),...
-                C_estim_raw(:,:,1), C_estim_raw(:,:,2), allmins, loglik] = ...
+                H_estim(:,:,1), H_estim(:,:,2),...
+                C_estim(:,:,1), C_estim(:,:,2), allmins, loglik] = ...
                 var_test_indep_emp(Y, Z, p, pml_settings, numboot, ...
                                     'verbose', verbose, 'initSetting', initSetting,...
                                     'initSettingBoot', 'full');                                    
@@ -144,19 +139,9 @@ else
         
         teststats_boot_quants = quantile(teststats_boot,quants); 
         
-        % Flip signs and permute estimated C to find best fit to reference
-        % matrices
-        for im=1:2 % For both PML and cumulant estimate
-            % Flip signs to ensure positive diagonal
-            the_estim       = C_estim_raw(:,:,im).*sign(diag(C_estim_raw(:,:,im))');
-            C_estim(:,:,im) = permute_mat(the_estim, CRef); % Best-fitting column permutation
-            C_estim_raw(:,:,im) = the_estim;
-            
-        end
         
         % Store output
         Spec(j).C_estim               = C_estim;
-        Spec(j).C_estim_raw           = C_estim_raw;
         Spec(j).H_estim               = H_estim;
         Spec(j).A                     = A;
         Spec(j).c                     = c;
@@ -255,6 +240,38 @@ for jSpec = 1:nSpec
 end
 
 writetable(out, [pathFigs 'bootTest.xls'])
+
+%% Save shocks
+
+outFile = ['figures2019/initSetting=' initSetting '_shocks.xls'];
+delete(outFile)  % Delete file if exists (prevent duplicate sheets)
+
+
+
+for jSpec = 1:nSpec
+    shocks = Spec(jSpec).shocks;
+    Time   = Spec(jSpec).dfEst.Properties.RowTimes;
+    p      = Spec(jSpec).p;
+    
+    % Make table
+    df        = array2table(Time(p+1:end), 'VariableNames', {'Time'});
+    df.shock1 = shocks(:, 1);
+    df.shock2 = shocks(:, 2);
+    df.shock3 = shocks(:, 3);
+    
+    % Reformat sheet name
+    sheetName = strrep(Spec(jSpec).nameDate, ':', '');
+    sheetName = strrep(sheetName, ', ', ' ');
+    sheetName = strrep(sheetName, ' (', ' ');
+    sheetName = strrep(sheetName, ')' , '' );
+    
+
+   writetable(df, outFile, 'Sheet', sheetName)
+end
+
+
+
+%% Save all output
 
 close all
 save([pathFigs 'Results.mat'], '-v7.3')

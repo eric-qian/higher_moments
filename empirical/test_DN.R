@@ -1,7 +1,7 @@
 # Preliminaries ----
 library('steadyICA')
 library('readxl')
-set.seed(2021)
+set.seed(2022)
 
 # Settings
 n = 3     
