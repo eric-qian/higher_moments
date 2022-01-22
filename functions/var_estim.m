@@ -1,4 +1,4 @@
-function [A, Sigma, c, res, cZ, aic, sc, hq] = var_estim2(Y, p, Z)
+function [A, Sigma, c, res, cZ, aic, sc, hq] = var_estim(Y, p, Z)
 % Modified 6/15/21. Add argument for exogenous variables Z.
 
     %% VAR least-squares estimation

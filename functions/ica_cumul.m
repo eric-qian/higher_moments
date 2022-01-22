@@ -1,6 +1,6 @@
+% ica_cumul()    ICA using fourth order cumulants
+% See Hyvarinen, Karhunen & Oja (2001), chapter 11.2 for details.
 function [H,C,cumuls,cumul_mat] = ica_cumul(X)
-
-    % ICA using fourth order cumulants
 
     % Whiten the data
     n = size(X,2);

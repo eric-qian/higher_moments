@@ -131,7 +131,7 @@ S   = simS_vol(obj_t, TShocks);
 
 obj_t.T = 200000;
 Y   = simY(obj_t);
-[A, Sigma, c] = var_estim2(Y, obj_t.p_est, []);
+[A, Sigma, c] = var_estim(Y, obj_t.p_est, []);
 disp('MSE, A')
 disp(mean((A(:)- obj_t.VARDGPSettings.A_true(:)).^2 ))
 
@@ -143,7 +143,7 @@ disp(mean((c(:)- obj_t.VARDGPSettings.c_true(:)).^2 ))
 
 obj_mix.T = 200000;
 Y   = simY(obj_t);
-[A, Sigma, c] = var_estim2(Y, obj_mix.p_est, []);
+[A, Sigma, c] = var_estim(Y, obj_mix.p_est, []);
 disp('MSE, A')
 disp(mean((A(:)- obj_mix.VARDGPSettings.A_true(:)).^2 ))
 
@@ -154,7 +154,7 @@ disp(mean((c(:)- obj_mix.VARDGPSettings.c_true(:)).^2 ))
 %% Test data generation function for short sample, t shocks
 obj_t.T = 20000;
 Y   = simY(obj_t);
-[A, Sigma, c] = var_estim2(Y, obj_t.p_est, []);
+[A, Sigma, c] = var_estim(Y, obj_t.p_est, []);
 disp('MSE, A')
 disp(mean((A(:)- obj_t.VARDGPSettings.A_true(:)).^2 ))
 
@@ -164,7 +164,7 @@ disp(mean((c(:)- obj_t.VARDGPSettings.c_true(:)).^2 ))
 %% Test data generation function for short sample, laplace shocks
 obj_lapl.T = 20000;
 Y   = simY(obj_t);
-[A, Sigma, c] = var_estim2(Y, obj_lapl.p_est, []);
+[A, Sigma, c] = var_estim(Y, obj_lapl.p_est, []);
 disp('MSE, A')
 disp(mean((A(:)- obj_lapl.VARDGPSettings.A_true(:)).^2 ))
 
@@ -176,7 +176,7 @@ disp(mean((c(:)- obj_lapl.VARDGPSettings.c_true(:)).^2 ))
 %% Test data generation function for short sample, mixture shocks
 obj_mix.T = 20000;
 Y   = simY(obj_t);
-[A, Sigma, c] = var_estim2(Y, obj_mix.p_est, []);
+[A, Sigma, c] = var_estim(Y, obj_mix.p_est, []);
 disp('MSE, A')
 disp(mean((A(:)- obj_mix.VARDGPSettings.A_true(:)).^2 ))
 

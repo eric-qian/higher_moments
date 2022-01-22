@@ -4,7 +4,7 @@ clear
 clc
 close all
 
-poolobj = parpool('local', 30);
+poolobj = parpool('local');
 addpath(genpath('../functions/'))
 
 

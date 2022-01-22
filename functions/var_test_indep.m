@@ -1,15 +1,13 @@
-function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmins, loglik] = var_test_indep_emp(Y, Z, p, varargin)
+function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmins, loglik] = var_test_indep(Y, Z, p, varargin)
 
-% Adapted from var_test_indep.m
-% Replicates the approach of the empirical example in
-% Gourieroux, Monfort, Renne (2017).
+% Based on the empirical example Gourieroux, Monfort, Renne (2017).
 %
 % Input:
-% - Y:               Endogenous variables
-% - Z:               Exogenous variables
-% - p:               Number of lags
-% - pml_settings:    PML mixture settings
-% - numboot:         Number of bootstrap draws
+% - Y:               Endogenous variables.
+% - Z:               Exogenous variables.
+% - p:               Number of lags.
+% - pml_settings:    PML mixture settings.
+% - numboot:         Number of bootstrap draws.
 % - verbose:         =1 to show output progress, =0 otherwise.
 % - initSetting:     Initalize using matrix, fourth-order cumulant
 %                    "cumul") or Global Search algorithm
@@ -19,18 +17,18 @@ function [teststat, teststats_boot, A, c, shocks, H, H_cumul, C, C_cumul, allmin
 %                    to initialize at the full-sample value.
 %
 % Output:
-% - teststat:       Test statistic.      
-% - teststats_boot: Test statistic for bootstrap draws.
-% - A:              VAR coefficients.
-% - c:              VAR constant.
-% - shocks:         Shock estimates.
-% - H:              Unwhitened mixing matrix.
-% - H_cumul:        Unwhitened mixing matrix (fourth-order cumulant).
-% - C:              Whitened mixing matrix.
-% - C_cumul:        Whitened mixing matrix (fourth-order cumulant).
-% - allmins:        If global optimization routine is run, stores ALL
-%                   values of C.
-% - loglik:         Log-liklihood.
+% - teststat:        Test statistic.      
+% - teststats_boot:  Test statistic for bootstrap draws.
+% - A:               VAR coefficients.
+% - c:               VAR constant.
+% - shocks:          Shock estimates.
+% - H:               Unwhitened mixing matrix.
+% - H_cumul:         Unwhitened mixing matrix (fourth-order cumulant).
+% - C:               Whitened mixing matrix.
+% - C_cumul:         Whitened mixing matrix (fourth-order cumulant).
+% - allmins:         If global optimization routine is run, stores ALL
+%                    values of C.
+% - loglik:          Log-liklihood.
 
 %% Parse input
 
@@ -75,7 +73,7 @@ initSettingBoot = parser.Results.initSettingBoot;
 [T,n] = size(Y);
 
 % Reduced form
-[A, ~, c, res, ~]  = var_estim2(Y, p, Z);
+[A, ~, c, res, ~]  = var_estim(Y, p, Z);
 
 % Preliminary estimate of H from fourth order cumulants
 [H_cumul,C_cumul] = ica_cumul(res);
@@ -159,7 +157,7 @@ else
             the_Y_boot = var_sim(A, c, the_shocks_boot*H', T, the_Y_init);
             
             % Calculate test statistic on bootstrap sample
-            teststats_boot(ib) = var_test_indep_emp(the_Y_boot, Z, p, pml_settings, 0,...
+            teststats_boot(ib) = var_test_indep(the_Y_boot, Z, p, pml_settings, 0,...
                 'verbose', false, 'initSetting', initSettingBoot);
             
             

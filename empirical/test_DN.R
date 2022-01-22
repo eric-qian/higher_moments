@@ -1,3 +1,6 @@
+# test_DN.R    Given shocks, produces the results of the testing procedure 
+#              featured in Davis and Ng (2021).
+
 # Preliminaries ----
 library('steadyICA')
 library('readxl')
