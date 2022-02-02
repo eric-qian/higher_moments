@@ -10,3 +10,5 @@ empirical/.Rhistory
 *.slurm
 empirical/figures2019/initSetting=GlobalSearch_bootTest.xls
 simulation/higher_moments_simul_test.m
+empirical/figures2019/initSetting=GlobalSearch_shocks.xls
+empirical/figures2019/initSetting=GlobalSearch_shocksPermTest.csv
