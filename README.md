@@ -1,6 +1,6 @@
 # SVAR Identification From Higher Moments
 
-This repo contains the MATLAB code for Montiel Olea, Plagborg-Møller, Qian (2022): "SVAR Identification From Higher Moments: Has the Simultaneous Causality Problem Been Solved?" ([paper](https://scholar.princeton.edu/mikkelpm/svar_higher_moments)).
+This repo contains the MATLAB code for Montiel Olea, Plagborg-Møller, Qian (2022): "[SVAR Identification From Higher Moments: Has the Simultaneous Causality Problem Been Solved?](https://doi.org/10.1257/pandp.20221047)", *AEA Papers and Proceedings* 112, 481-448 ([working paper version](https://www.mikkelpm.com/files/svar_higher_moments.pdf)).
 
 **Development note**: Tested with MATLAB R2020b on macOS Monterey 12.1. The MATLAB code requires the Optimization, Global Optimization, Parallel Computing, and Datafeed toolboxes. The R code requires the steadyICA package.
 
